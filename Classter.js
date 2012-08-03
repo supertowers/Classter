@@ -23,9 +23,9 @@ var Class = (function() {
 		case (obj instanceof RegExp):
 			return new RegExp(obj.source, (obj.global && 'g') + (obj.ignoreCase && 'i') + (obj.multiline && 'm'));
 		
-		case Boolean:
-		case String:
-		case Number:
+		case (obj instanceof Boolean):
+		case (obj instanceof String):
+		case (obj instanceof Number):
 			return new obj.constructor(obj.valueOf());
 		
 		case (obj instanceof Object):
