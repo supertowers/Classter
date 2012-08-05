@@ -18,7 +18,9 @@ var Class = (function() {
 			return obj;
 		
 		case (obj instanceof RegExp):
-			return new RegExp(obj.source, (obj.global && 'g') + (obj.ignoreCase && 'i') + (obj.multiline && 'm'));
+			var flags = (obj.global && 'g' || '') + (obj.ignoreCase && 'i' || '') + (obj.multiline && 'm' || '');
+			
+			return new RegExp(obj.source, flags);
 		
 		//Valid for Date objects, see 15.9.5.8.
 		case (obj instanceof Date):
