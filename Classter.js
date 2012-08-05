@@ -57,38 +57,48 @@ var Class = (function() {
 		var member;
 		var proto;
 		
-		//Create builder (which wraps the constructor.
-		builder = function() {
-			if (arguments[0] !== INHERIT) {
-				for (member in this) {
-					this[member] = clone(this[member]);
+		if (members) {
+			if (!(members instanceof Object)) {
+				throw new TypeError('Invalid members object passed');
+			}
+			
+			//Create builder (which wraps the constructor).
+			builder = function() {
+				if (arguments[0] !== INHERIT) {
+					if (!(this instanceof builder)) {
+						throw new TypeError('Invalid context detected. Maybe you forgot the \'new\' keyword?');
+					}
+					
+					for (member in this) {
+						this[member] = clone(this[member]);
+					}
+					
+					this.constructor.apply(this, arguments);
+				}
+			};
+			
+			//Extend prototype.
+			if (typeof extend === 'function') {
+				proto = builder.prototype = new extend(INHERIT);
+				
+				for (member in proto) {
+					if (proto.hasOwnProperty(member)) {
+						proto[member] = clone(proto[member]);
+					}
 				}
 				
-				this.constructor.apply(this, arguments);
-			}
-		};
-		
-		//Extend prototype.
-		if (typeof extend === 'function') {
-			proto = builder.prototype = new extend(INHERIT);
-			
-			for (member in proto) {
-				if (proto.hasOwnProperty(member)) {
-					proto[member] = clone(proto[member]);
+				for (member in members) {
+					if (members.hasOwnProperty(member)) {
+						proto[member] = members[member];
+					}
 				}
+			} else {
+				builder.prototype = members;
 			}
 			
-			for (member in members) {
-				if (members.hasOwnProperty(member)) {
-					proto[member] = members[member];
-				}
-			}
-		} else {
-			builder.prototype = members;
+			//Return builder.
+			return builder;
 		}
-		
-		//Return builder.
-		return builder;
 	}
 	
 	

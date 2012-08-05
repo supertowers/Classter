@@ -45,3 +45,10 @@ console.log(a.group.of.nested.objects); //Should return 'A';
 console.log(b.group.of.nested.objects); //Should return 'B';
 
 console.log(b.objString === v.objString); //Should return false.
+
+//Should print 'Ok'.
+try {
+	var x = A();
+} catch (err) {
+	(err instanceof TypeError) && console.log('Ok');
+}
