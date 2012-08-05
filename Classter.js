@@ -18,7 +18,7 @@ var Class = (function() {
 			return obj;
 		
 		case (obj instanceof RegExp):
-			var flags = (obj.global && 'g' || '') + (obj.ignoreCase && 'i' || '') + (obj.multiline && 'm' || '');
+			var flags = (obj.global? 'g' : '') + (obj.ignoreCase? 'i' : '') + (obj.multiline? 'm' : '');
 			
 			return new RegExp(obj.source, flags);
 		
