@@ -17,12 +17,11 @@ var Class = (function() {
 		case (obj instanceof Function):
 			return obj;
 		
-		case (obj instanceof Date):
-			return new Date(obj.getTime());
-		
 		case (obj instanceof RegExp):
 			return new RegExp(obj.source, (obj.global && 'g') + (obj.ignoreCase && 'i') + (obj.multiline && 'm'));
 		
+		//Valid for Date objects, see 15.9.5.8.
+		case (obj instanceof Date):
 		case (obj instanceof Boolean):
 		case (obj instanceof String):
 		case (obj instanceof Number):
