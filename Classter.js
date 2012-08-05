@@ -63,10 +63,12 @@ var Class = (function() {
 			}
 			
 			//Create builder (which wraps the constructor).
-			builder = function() {
-				if (arguments[0] !== INHERIT) {
+			builder = function(inheriting) {
+				var member;
+				
+				if (inheriting !== INHERIT) {
 					if (!(this instanceof builder)) {
-						throw new TypeError('Invalid context detected. Maybe you forgot the \'new\' keyword?');
+						throw new TypeError('Invalid context detected. Forgot the "new" keyword?');
 					}
 					
 					for (member in this) {
