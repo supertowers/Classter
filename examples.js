@@ -1,5 +1,5 @@
 var A = new Class({
-	constructor: function() {
+	construct: function() {
 		console.log('created instance of A');
 	},
 	
@@ -14,8 +14,8 @@ var A = new Class({
 });
 
 
-var B = new Class({
-	constructor: function() {
+var B = new Class(A, {
+	construct: function() {
 		console.log('created instance of B');
 	},
 	
@@ -30,7 +30,7 @@ var B = new Class({
 	
 	
 	objString: new String('Hello')
-}, A); //Inherits from A.
+}); //Inherits from A.
 
 
 var a = new A();

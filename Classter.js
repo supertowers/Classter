@@ -14,9 +14,6 @@ var Class = (function() {
 			
 			return cloned;
 		
-		case (obj instanceof Function):
-			return obj;
-		
 		case (obj instanceof RegExp):
 			var flags = (obj.global? 'g' : '') + (obj.ignoreCase? 'i' : '') + (obj.multiline? 'm' : '');
 			
@@ -28,6 +25,13 @@ var Class = (function() {
 		case (obj instanceof String):
 		case (obj instanceof Number):
 			return new obj.constructor(obj.valueOf());
+		
+		case (obj instanceof Class):
+			if (typeof obj.clone === 'function') {
+				return obj.clone();
+			} else {
+				throw new ReferenceError('Classes needs to implement a "clone" method for being cloned');
+			}
 		
 		case (obj instanceof Object):
 			var cloned = {};
@@ -44,7 +48,7 @@ var Class = (function() {
 	
 	
 	function clone(obj) {
-		if (obj instanceof Object) {
+		if ((obj instanceof Object) && (typeof obj !== 'function')) {
 			return _cloneObject(obj);
 		} else {
 			return obj;
@@ -52,10 +56,24 @@ var Class = (function() {
 	}
 	
 	
-	function Class(members, extend) {
+	function Class() {
+		var members = null;
+		var extend = null;
 		var builder;
 		var member;
 		var proto;
+		
+		//Check arguments.
+		switch (arguments.length) {
+		case 1:
+			members = arguments[0];
+			break;
+			
+		case 2:
+			members = arguments[1];
+			extend = arguments[0];
+			break;
+		}
 		
 		if (members) {
 			if (!(members instanceof Object)) {
@@ -72,30 +90,38 @@ var Class = (function() {
 					}
 					
 					for (member in this) {
-						this[member] = clone(this[member]);
+						if (typeof this !== 'function') {
+							this[member] = clone(this[member]);
+						}
 					}
 					
-					this.constructor.apply(this, arguments);
+					if (this.construct instanceof Function) {
+						this.construct.apply(this, arguments);
+					}
 				}
 			};
 			
-			//Extend prototype.
-			if (typeof extend === 'function') {
-				proto = builder.prototype = new extend(INHERIT);
-				
-				for (member in proto) {
-					if (proto.hasOwnProperty(member)) {
-						proto[member] = clone(proto[member]);
-					}
-				}
-				
-				for (member in members) {
-					if (members.hasOwnProperty(member)) {
-						proto[member] = members[member];
-					}
-				}
+			//Create the adequate prototype, depending on whether there is a base class or not.
+			if (extend instanceof Function) {
+				proto = new extend(INHERIT);
 			} else {
-				builder.prototype = members;
+				proto = new Class();
+			}
+			
+			//Set prototype.
+			builder.prototype = proto;
+			
+			//Extend prototype.
+			for (member in proto) {
+				if (proto.hasOwnProperty(member) && (typeof member !== 'function')) {
+					proto[member] = clone(proto[member]);
+				}
+			}
+			
+			for (member in members) {
+				if (members.hasOwnProperty(member)) {
+					proto[member] = members[member];
+				}
 			}
 			
 			//Return builder.
