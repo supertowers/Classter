@@ -1,7 +1,6 @@
 # Classter
-----------
 
-Classter is a library (still in beta) developed to hide prototypal inheritance (and its advantages and inconveniences) to JavaScript developers familiarizated with classical concepts of OOP, like classes, abstract classes, interfaces... The library is designed to be lightweight, with the minimum overload. Additionally, it is a standalone library; and fully compatible with major frameworks, although some of them already implement a similar system.
+Classter is a library (still in beta) **developed to hide prototypal inheritance** (and its advantages and inconveniences) to **developers familiarizated with classical concepts of OOP**, like classes, abstract classes, interfaces... The library is designed to be lightweight, with the minimum overload. Additionally, it is a standalone library; and fully compatible with major frameworks, although some of them already implement a similar system.
 
 In addiion, Classter has other advantages, that some developers will find useful because it fits their general 
 
@@ -13,11 +12,10 @@ In addiion, Classter has other advantages, that some developers will find useful
  * Works in client-side and server-side (NodeJS) with minimal changes.
  
  
-Classter is MIT licensed. For further details, see license.md file.
+**Classter is MIT licensed.** For further details, see license.md file.
 
 
 ## Getting started
-------------------
 
 For getting started, you only need to include the minified version of the library, although is recommended to use the development version (as it will help you to detect and solve problem, plus inform more precisely about bugs you will find). Once you have it included, you can already start to write your first class:
 
@@ -65,7 +63,6 @@ Classter is fully compatible with **instanceof** operator, so you can use at any
 
 
 ## Extending classes
---------------------
 
 Classter supports class extension (at the moment, only simple inheritance is supported, due to JS restrictions). The extension is also compatible with the **instanceof** operator. In order to extend a class, you only need to pass it as the first argument of the class constructor:
 
@@ -94,6 +91,5 @@ Keep in mind that Classter can only extend (for the moment) classes created by i
 
 
 ## Full documentation
----------------------
 
-Full documentation is still in progress. For the moment, you can contact me at twitter (@mjesun). I will be pretty glad to solve any problem/issues you will find.
+Full documentation is still in progress. For the moment, you can contact me at twitter (**@mjesun**). I will be pretty glad to solve any problem/issues you will find.
