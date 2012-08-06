@@ -30,7 +30,7 @@ var Network = new Class({
     
     
     getName: function() {
-        return this._number;
+        return this._name;
     },
     
     

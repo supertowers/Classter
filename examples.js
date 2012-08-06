@@ -1,3 +1,6 @@
+'use strict';
+
+
 var A = new Class({
 	construct: function() {
 		console.log('created instance of A');
