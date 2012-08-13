@@ -5,6 +5,25 @@
 	var INHERIT = {};
 	
 	
+	function _getRealConstructor(obj) {
+		var constructor = obj.constructor;
+		var original;
+		
+		if (obj.hasOwnProperty('constructor')) {
+			original = obj.constructor;
+			
+			//Delete the value to reveal the original constructor.
+			delete obj.constructor;
+			constructor = obj.constructor;
+			
+			//Restore it.
+			obj.constructor = original;
+		}
+		
+		return constructor;
+	}
+	
+	
 	function _cloneObject(obj) {
 		switch (true) {
 		case (obj instanceof Array):
@@ -22,12 +41,12 @@
 			
 			return new RegExp(obj.source, flags);
 		
-		//Valid for Date objects, see 15.9.5.8.
+		//Valid for Date objects, see ECMA-262, section 15.9.5.8.
 		case (obj instanceof Date):
 		case (obj instanceof Boolean):
 		case (obj instanceof String):
 		case (obj instanceof Number):
-			return new obj.constructor(obj.valueOf());
+			return new _getRealConstructor(obj)(obj.valueOf());
 		
 		case (obj instanceof Class):
 			if (typeof obj.clone === 'function') {
@@ -37,7 +56,25 @@
 			}
 		
 		case (obj instanceof Object):
-			var cloned = {};
+			var wrapper;
+			var cloned;
+			var proto;
+			
+			//Get the most possible accurate value of the prototype.
+			if (Object.getPrototypeOf) {
+				proto = Object.getPrototypeOf(obj);
+			} else {
+				proto = _getRealConstructor(obj).prototype;
+			}
+			
+			//Create a valid instance.
+			if (proto === Object.prototype) {
+				cloned = {};
+			} else {
+				wrapper = function() {};
+				wrapper.prototype = proto;
+				cloned = new wrapper();
+			}
 			
 			for (var member in obj) {
 				if (obj.hasOwnProperty(member)) {
