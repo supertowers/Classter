@@ -1,7 +1,7 @@
 'use strict';
 
 
-var Class = (function() {
+(function(global) {
 	var INHERIT = {};
 	
 	
@@ -59,24 +59,115 @@ var Class = (function() {
 	}
 	
 	
-	function Class() {
+	
+	
+	
+	function _classArgs(args) {
 		var members = null;
-		var extend = null;
-		var builder;
-		var member;
-		var proto;
+		var base = null;
+		var interfaces = null;
+		var length;
+		var i;
 		
-		//Check arguments.
-		switch (arguments.length) {
-		case 1:
-			members = arguments[0];
-			break;
+		//Get arguments, depending on length and types.
+		if (args.length === 0) {
+			//Do nothing, we are calling it for inheritance.
 			
-		case 2:
-			members = arguments[1];
-			extend = arguments[0];
-			break;
+		} else if (args.length === 1) {
+			members = args[0];
+		
+		} else if ((args.length === 2) && (args[0] instanceof Function)) {
+			base = args[0];
+			members = args[1];
+		
+		} else if ((args.length === 2) && (args[0] instanceof Array)) {
+			interfaces = args[0];
+			members = args[1];
+		
+		} else if ((args.length === 3) && (args[0] instanceof Function) && (args[1] instanceof Array)) {
+			base = args[0];
+			interfaces = args[1];
+			members = args[2];
+		
+		} else {
+			throw new TypeError('Invalid parameters passed');
 		}
+		
+		//Check list of interfaces.
+		if (interfaces) {
+			for (length = interfaces.length; i--; ) {
+				if (!(interfaces[i] instanceof Interface)) {
+					throw new TypeError('Invalid interface found at position ' + i);
+				}
+			}
+		}
+		
+		//Return object.
+		return {
+			members: members,
+			base: base,
+			interfaces: interfaces
+		};
+	}
+	
+	
+	function _fillClass(builder, extend, members) {
+		var proto;
+		var member;
+		
+		//Get the right prototype object.
+		if (extend instanceof Function) {
+			proto = new extend(INHERIT);
+		} else {
+			proto = new Class();
+		}
+		
+		for (member in proto) {
+			if (proto.hasOwnProperty(member) && (typeof member !== 'function')) {
+				proto[member] = clone(proto[member]);
+			}
+		}
+		
+		for (member in members) {
+			if (members.hasOwnProperty(member)) {
+				proto[member] = members[member];
+			}
+		}
+		
+		//Set prototype.
+		builder.prototype = proto;
+	}
+	
+	
+	function _isImplemented(builder, interfaces) {
+		var proto = builder.prototype;
+		var iface;
+		var method;
+		var i;
+		
+		//Now, check interfaces, if they exist.
+		for (i = interfaces.length; i--; ) {
+			iface = interfaces[i];
+			
+			for (method in iface) {
+				if (iface.hasOwnProperty(method)) {
+					if (!(proto[method] instanceof Function)) {
+						throw new ReferenceError('Method ' + method + ' needed for implementing an interface does not exist');
+					} else if (proto[method].length !== iface[method].length) {
+						throw new ReferenceError('Method ' + method + ' does not match the interface');
+					}
+				}
+			}
+		}
+	}
+	
+	
+	function Class() {
+		var args = _classArgs(arguments);
+		var members = args.members;
+		var base = args.base;
+		var interfaces = args.interfaces;
+		var builder;
 		
 		if (members) {
 			if (!(members instanceof Object)) {
@@ -93,7 +184,7 @@ var Class = (function() {
 					}
 					
 					for (member in this) {
-						if (typeof this !== 'function') {
+						if (typeof this[member] !== 'function') {
 							this[member] = clone(this[member]);
 						}
 					}
@@ -104,27 +195,13 @@ var Class = (function() {
 				}
 			};
 			
-			//Create the adequate prototype, depending on whether there is a base class or not.
-			if (extend instanceof Function) {
-				proto = new extend(INHERIT);
-			} else {
-				proto = new Class();
-			}
+			//Fulfill the class.
+			_fillClass(builder, base, members);
 			
-			//Set prototype.
-			builder.prototype = proto;
-			
-			//Extend prototype.
-			for (member in proto) {
-				if (proto.hasOwnProperty(member) && (typeof member !== 'function')) {
-					proto[member] = clone(proto[member]);
-				}
-			}
-			
-			for (member in members) {
-				if (members.hasOwnProperty(member)) {
-					proto[member] = members[member];
-				}
+			//Check adequate interface implementation.
+			if (interfaces) {
+				_isImplemented(builder, interfaces);
+				builder.$interfaces = interfaces;
 			}
 			
 			//Return builder.
@@ -133,5 +210,27 @@ var Class = (function() {
 	}
 	
 	
-	return Class;
-})();
+	
+	
+	
+	function Interface(methods) {
+		var method;
+		
+		for (method in methods) {
+			if (methods.hasOwnProperty(method)) {
+				if (!(methods[method] instanceof Function)) {
+					throw new TypeError('Interfaces can only contain public methods');
+				}
+				
+				this[method] = methods[method];
+			}
+		}
+	}
+	
+	
+	
+	
+	
+	global.Class = Class;
+	global.Interface = Interface;
+})(this);
